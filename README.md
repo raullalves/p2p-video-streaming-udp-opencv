@@ -13,7 +13,9 @@ To compile the project, you should use c++11, and include OpenCV libraries, such
     >>g++ -std=c++11 -o videostreaming main.cpp Peer.cpp No.cpp -I"<OPENCV_INCLUDE_DIR>" -L"<MINGW_LIB_DIR>" -lWS2_32 -llibopencv_core310 -llibopencv_highgui310 -llibopencv_imgcodecs310 -llibopencv_videoio310 -llibopencv_imgproc310
     
 Where OPENCV_INCLUDE_DIR = Location of your opencv. Ex, in my case it was C:/opencv/include
+
 MINGW_LIB_DIR = MinGW libs location
+
 libopencv_core310, libopencv_highgui310.. -> are the opencv libraries. You shoud change it for your specific OpenCV version
 
 Any doubts, feel free to ask.
