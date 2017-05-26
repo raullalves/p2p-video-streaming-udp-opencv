@@ -1,4 +1,4 @@
-# Peer to Peer (P2P) Video Streaming using UDP
+# PEER TO PEER (P2P) VIDEO STREAMING USING UDP
 
 This is a Peer to Peer application that streams the WebCam video using UDP.
 Initially, the system creates a socket where it sends repeatedly , in a separate thread, a specific string message in broadcast mode. On the other side, in another thread, that same socket keeps listening for that same string message coming from another IP address, different from the host where the system is running into.
