@@ -40,16 +40,16 @@ public:
 	No * no;
 	Peer(void);
 	~Peer(void);
-	bool buscar_bool;
-	bool avisar_bool;
-	void buscar();
-	void avisar();
-	void sair();
-	void receberVideo();
-	void conectarPeer(char* ip, int port);
+	bool findNetwork_Boolean;
+	bool tellNetwork_Boolean;
+	void findOtherPeers();
+	void tellOtherPeers();
+	void leave();
+	void getVideo();
+	void connectPeer(char* ip, int port);
 	struct sockaddr_in Recv_addr;
 	struct sockaddr_in Sender_addr;
-	struct sockaddr_in ip_atual;
+	struct sockaddr_in ip_current;
 	char* ip_destino;
 	int porta_destino;
 	

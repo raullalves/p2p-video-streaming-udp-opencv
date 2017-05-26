@@ -5,7 +5,7 @@ No::No(void){
 	
 	qtd_nos = 0;
 	ips = new char*[QTD_MAXIMA];
-	porta = new int[QTD_MAXIMA];
+	port = new int[QTD_MAXIMA];
 	
 }
 
@@ -15,29 +15,29 @@ No::~No(void){
 	for (int i = 0; i < qtd_nos; i++)
 		delete[] ips[i];
 	delete[] ips;
-	delete[] porta;
+	delete[] port;
 	
 }
 
 //add new node
-void No::addNovoNo(char * ip, int port){
+void No::addNewNode(char * ip, int port){
 	
-	bool noJaExiste = false;
+	bool alreadyExists = false;
 	
-	for (int i = 0; (i < qtd_nos) && !(noJaExiste); i++)
+	for (int i = 0; (i < qtd_nos) && !(alreadyExists); i++)
 		if (strcmp(ips[i],ip) == 0)
-			noJaExiste = true;
+			alreadyExists = true;
 		
-	if (!noJaExiste){
+	if (!alreadyExists){
 		ips[qtd_nos] = ip;
-		porta[qtd_nos] = port;
+		port[qtd_nos] = port;
 		qtd_nos++;
 	}
 	
 }
 
 //remove node
-void No::removerNo(char * ip){
+void No::removeNode(char * ip){
 	
 	for (int i = 0; i < qtd_nos; i++){
 		
@@ -46,7 +46,7 @@ void No::removerNo(char * ip){
 			qtd_nos--;
 			if(i != qtd_nos){
 				ips[i] = ips[qtd_nos];
-				porta[i] = porta[qtd_nos];
+				port[i] = port[qtd_nos];
 			}
 			
 		}	
@@ -64,7 +64,7 @@ char * No::getIP(int i){
 //returns port number
 int No::getPorta(int i){
 	
-	return porta[i];
+	return port[i];
 	
 }
 
@@ -72,7 +72,7 @@ int No::getPorta(int i){
 void No::exibirNos(){
 	
 	for (int i = 0; i<qtd_nos; i++)
-		cout<<"no numero "<<i<<endl<<"ip = "<<ips[i]<<endl<<"porta= "<<porta[i]<<endl;
+		cout<<"Node number "<<i<<endl<<"ip = "<<ips[i]<<endl<<"port= "<<port[i]<<endl;
 	
 }
 

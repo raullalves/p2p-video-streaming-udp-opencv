@@ -14,8 +14,8 @@ class No{
 	
 		No(void);
 		~No(void);
-		void addNovoNo(char * ip, int port);
-		void removerNo(char * ip);
+		void addNewNode(char * ip, int port);
+		void removeNode(char * ip);
 		void exibirNos();
 		int getQtdNos();
 		char* getIP(int i);
@@ -24,6 +24,6 @@ class No{
 	private:
 		int qtd_nos;
 		char** ips;
-		int* porta;
+		int* port;
 		
 };

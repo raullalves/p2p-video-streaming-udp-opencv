@@ -3,8 +3,8 @@
 //construtor of peer class
 Peer::Peer(void) {
 
-	buscar_bool = true;
-	avisar_bool = true;
+	findNetwork_Boolean = true;
+	tellNetwork_Boolean = true;
 	string mensagemP2p = "GettingInside";
 
 	strcpy(msgBroadcast, mensagemP2p.c_str());
@@ -67,9 +67,9 @@ Peer::Peer(void) {
 	
 	memcpy(&addr, host->h_addr_list[0], sizeof(struct in_addr));
 
-	ip_atual.sin_family = AF_INET;
-	ip_atual.sin_port = htons(PORT);
-	ip_atual.sin_addr.s_addr = inet_addr(inet_ntoa(addr));
+	ip_current.sin_family = AF_INET;
+	ip_current.sin_port = htons(PORT);
+	ip_current.sin_addr.s_addr = inet_addr(inet_ntoa(addr));
 
 	cout << "Peer criado com sucesso" << endl;
 
@@ -84,12 +84,12 @@ Peer::~Peer(void) {
 }
 
 //Find new friends in network
-void Peer::buscar()
+void Peer::findOtherPeers()
 {
 	
 	char recvBuff[50];
 	int recvBuffLen = 50;
-	while (buscar_bool)
+	while (findNetwork_Boolean)
 	{
 		struct sockaddr_in Recv_addr2;
 		
@@ -115,15 +115,15 @@ void Peer::buscar()
 		char *connected_ip= inet_ntoa(ipt.sin_addr);
 		string con_ip(connected_ip);
 		
-		char *meuIP = inet_ntoa(ip_atual.sin_addr);
+		char *meuIP = inet_ntoa(ip_current.sin_addr);
 		string my_ip(meuIP);
 		
 		if ((strcmp(recvBuff, msgAdmissao) == 0) && !(my_ip.compare(con_ip) == 0)) {
 			
-			int porta = PORT;
+			int port = PORT;
 			char* temp_ip = new char[con_ip.length() + 1];
 			strcpy(temp_ip, con_ip.c_str());
-			no->addNovoNo(temp_ip, porta);
+			no->addNewNode(temp_ip, port);
 
 		}
 		
@@ -131,7 +131,7 @@ void Peer::buscar()
 
 			char* temp_ip = new char[con_ip.length() + 1];
 			strcpy(temp_ip, con_ip.c_str());
-			no->removerNo(temp_ip);
+			no->removeNode(temp_ip);
 
 		}
 
@@ -140,10 +140,10 @@ void Peer::buscar()
 }
 
 //tell broadcast you are in the netowrk
-void Peer::avisar()
+void Peer::tellOtherPeers()
 {
 	
-	while (avisar_bool)
+	while (tellNetwork_Boolean)
 	{
 		if (sendto(socketUdp, msgBroadcast, strlen(msgBroadcast) + 1, 0, (sockaddr *)&Sender_addr, sizeof(Sender_addr)) < 0)
 		{
@@ -159,14 +159,14 @@ void Peer::avisar()
 }
 
 //leave the network
-void Peer::sair() {
+void Peer::leave() {
 	string mensagemSaindo = "Leaving";
 	strcpy(msgBroadcast, mensagemSaindo.c_str());
 	Sleep(1500);
 }
 
 //get video
-void Peer::receberVideo() {
+void Peer::getVideo() {
 	
 	sockaddr_in Video_addr;
 	
@@ -223,14 +223,14 @@ void Peer::receberVideo() {
 //wrapper to start a thread with a class method
 void __cdecl Peer::temp(void * params) {
 
-		static_cast<Peer*>(params)->receberVideo();
+		static_cast<Peer*>(params)->getVideo();
 }
 
 //connect to peer and send video daata
-void Peer::conectarPeer(char* ip, int port) {
+void Peer::connectPeer(char* ip, int port) {
 	
-	buscar_bool = false;
-	avisar_bool = false;
+	findNetwork_Boolean = false;
+	tellNetwork_Boolean = false;
 	
 	ip_destino = ip;
 	porta_destino = port;
