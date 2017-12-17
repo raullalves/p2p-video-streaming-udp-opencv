@@ -2,7 +2,7 @@
 //Computer Engineer
 
 #include "Peer.h"
-#include <process.h>
+#include <pthread.h>
 #include <iostream>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -16,7 +16,7 @@ using namespace cv;
 Peer * peer;
 
 //method to show that you are in the network
-void tellYouAreInTheNetwork(void* pParams) {
+void *tellYouAreInTheNetwork(void* pParams) {
 	
 	while (peer->tellNetwork_Boolean) {
 		peer->tellOtherPeers();
@@ -25,7 +25,7 @@ void tellYouAreInTheNetwork(void* pParams) {
 }
 
 //method to find new nodes in network
-void findWhoIsInTheNetwork(void* pParams) {
+void *findWhoIsInTheNetwork(void* pParams) {
 	
 	while (peer->findNetwork_Boolean) {
 		peer->findOtherPeers();
@@ -58,39 +58,41 @@ int getOption() {
 //choses friend in node list to stream
 void chooseConnection() {
 	
-	system("cls");
+	system("clear");
 	cout << "Which one would you like to stream? " << endl;
-	peer->no->exibirNos();
+	peer->node->exibirNos();
+
 	cout << "Select the Peer`s number: " << endl;
 	int number;
 	cin >> number;
-	char* ip = peer -> no -> getIP(number);
-	int port = peer -> no -> getPorta(number);
+	char* ip = peer -> node -> getIP(number);
+	int port = peer -> node -> getPorta(number);
 	peer->connectPeer(ip, port);
 
 }
 
 //main function
-int main() {
+int main(int argc, char *argv[]) {
 
 	int option;
-	
+	int i,j;
 	peer = new Peer();
-	
-	_beginthread(tellYouAreInTheNetwork, 0, NULL);
-	_beginthread(findWhoIsInTheNetwork, 0, NULL);
-	
+
+	pthread_t threads[2];
+	pthread_create( &threads[0], NULL, tellYouAreInTheNetwork,(void *)i);
+	pthread_create( &threads[1], NULL, findWhoIsInTheNetwork, (void *)j);
+	system("clear");
 	do {
 		
-		system("cls");
+		
 		showMenu();
 		option = getOption();
 		
 		switch (option) {
 			
 		case 1:
-			peer->no->exibirNos();
-			system("PAUSE");
+			peer->node->exibirNos();
+			getchar();
 			break;
 			
 		case 2:
@@ -101,12 +103,11 @@ int main() {
 			cout << "Saindo da rede..." << endl;
 			peer->leave();
 			delete peer;
-			return 0;
-			break;
+			exit(0);
 			
 		default:
 			cout << endl << "Opcao incorreta..." << endl;
-			Sleep(2000);
+			sleep(2000);
 			break;
 			
 		}

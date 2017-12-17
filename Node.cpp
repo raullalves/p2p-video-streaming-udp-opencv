@@ -1,26 +1,8 @@
-#include "No.h"
-
-//constructor
-No::No(void){
-	
-	qtd_nos = 0;
-	ips = new char*[QTD_MAXIMA];
-	port = new int[QTD_MAXIMA];
-	
-}
-
-//destructor
-No::~No(void){
-	
-	for (int i = 0; i < qtd_nos; i++)
-		delete[] ips[i];
-	delete[] ips;
-	delete[] port;
-	
-}
+#include "Node.h"
+using namespace std;
 
 //add new node
-void No::addNewNode(char * ip, int port){
+void Node::addNewNode(char * ip, int port){
 	
 	bool alreadyExists = false;
 	
@@ -30,14 +12,14 @@ void No::addNewNode(char * ip, int port){
 		
 	if (!alreadyExists){
 		ips[qtd_nos] = ip;
-		port[qtd_nos] = port;
+		ports[qtd_nos] = port;
 		qtd_nos++;
 	}
 	
 }
 
 //remove node
-void No::removeNode(char * ip){
+void Node::removeNode(char * ip){
 	
 	for (int i = 0; i < qtd_nos; i++){
 		
@@ -46,7 +28,7 @@ void No::removeNode(char * ip){
 			qtd_nos--;
 			if(i != qtd_nos){
 				ips[i] = ips[qtd_nos];
-				port[i] = port[qtd_nos];
+				ports[i] = ports[qtd_nos];
 			}
 			
 		}	
@@ -55,31 +37,30 @@ void No::removeNode(char * ip){
 }
 
 //returns ip
-char * No::getIP(int i){
+char * Node::getIP(int i){
 	
 	return ips[i];
 	
 }
 
 //returns port number
-int No::getPorta(int i){
+int Node::getPorta(int i){
 	
-	return port[i];
+	return ports[i];
 	
 }
 
 //show friend list
-void No::exibirNos(){
+void Node::exibirNos(){
 	
 	for (int i = 0; i<qtd_nos; i++)
-		cout<<"Node number "<<i<<endl<<"ip = "<<ips[i]<<endl<<"port= "<<port[i]<<endl;
+		cout<<"Node number "<<i<<endl<<"ip = "<<ips[i]<<endl<<"port= "<<ports[i]<<endl;
 	
 }
 
 //returns total quantity of nodes in network
-int No::getQtdNos(){
+int Node::getQtdNos(){
 	
 	return qtd_nos;
 	
 }
-	

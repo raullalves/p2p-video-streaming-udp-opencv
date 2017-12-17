@@ -1,92 +1,17 @@
 #include "Peer.h"
 
-//construtor of peer class
-Peer::Peer(void) {
+using namespace std;
+using namespace cv;
 
-	findNetwork_Boolean = true;
-	tellNetwork_Boolean = true;
-	string mensagemP2p = "GettingInside";
-
-	strcpy(msgBroadcast, mensagemP2p.c_str());
-	strcpy(msgAdmissao, mensagemP2p.c_str());
-
-	string mensagemSaindo = "Leaving";
-	strcpy(msgSaida, mensagemP2p.c_str());
-
-	no = new No();
-	WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-	socketUdp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	char broadcast = 'a';
-	
-	if (setsockopt(socketUdp, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0)
-	{
-		cout << "Erro 1" << endl;
-		closesocket(socketUdp);
-		
-	}
-
-	Recv_addr.sin_family = AF_INET;
-	Recv_addr.sin_port = htons(PORT);
-	Recv_addr.sin_addr.s_addr = INADDR_ANY;
-	Sender_addr.sin_family = AF_INET;
-	Sender_addr.sin_port = htons(PORT);
-	Sender_addr.sin_addr.s_addr = inet_addr("255.255.255.255");
-
-	if (bind(socketUdp, (sockaddr*)&Recv_addr, sizeof(Recv_addr)) < 0)
-	{
-		cout << "Erro 2" << endl;
-		closesocket(socketUdp);
-	}
-
-	WSAData wsaData2;
-	WSAStartup(MAKEWORD(1, 1), &wsaData2);
-	char nomePc[80];
-	
-	if (gethostname(nomePc, sizeof(nomePc)) == SOCKET_ERROR) {
-		cout << "Erro 4" << endl;
-		WSACleanup();
-		return;
-	}
-	cout<<nomePc;
-	
-	struct hostent *host = gethostbyname(nomePc);
-	
-	if (host == 0) {
-		cout << "Erro 5" << endl;
-		WSACleanup();
-		return;
-	}
-
-	if (host->h_addr_list[0] == 0) {
-		cout << "Erro 6" << endl;
-		return;
-	}
-
-	struct in_addr addr;
-	
-	memcpy(&addr, host->h_addr_list[0], sizeof(struct in_addr));
-
-	ip_current.sin_family = AF_INET;
-	ip_current.sin_port = htons(PORT);
-	ip_current.sin_addr.s_addr = inet_addr(inet_ntoa(addr));
-
-	cout << "Peer criado com sucesso" << endl;
-
-}
-
-//destrutor
-Peer::~Peer(void) {
-
-	closesocket(socketUdp);
-	WSACleanup();
-
+void Peer::error(const char *msg)
+{
+    perror(msg);
+    exit(1);
 }
 
 //Find new friends in network
 void Peer::findOtherPeers()
 {
-	
 	char recvBuff[50];
 	int recvBuffLen = 50;
 	while (findNetwork_Boolean)
@@ -97,6 +22,7 @@ void Peer::findOtherPeers()
 		
 		char from_ip[1024];
 		getnameinfo((struct sockaddr*)&Recv_addr2, sizeof(Recv_addr2), from_ip, 1024, NULL, NULL, 0);
+		
 		struct hostent *host = gethostbyname(from_ip);
 		struct in_addr addr;
 		
@@ -117,13 +43,13 @@ void Peer::findOtherPeers()
 		
 		char *meuIP = inet_ntoa(ip_current.sin_addr);
 		string my_ip(meuIP);
-		
 		if ((strcmp(recvBuff, msgAdmissao) == 0) && !(my_ip.compare(con_ip) == 0)) {
 			
 			int port = PORT;
 			char* temp_ip = new char[con_ip.length() + 1];
 			strcpy(temp_ip, con_ip.c_str());
-			no->addNewNode(temp_ip, port);
+			node->addNewNode(temp_ip, port);
+			cout<<"New peer at network: "<<temp_ip<<endl;
 
 		}
 		
@@ -131,7 +57,8 @@ void Peer::findOtherPeers()
 
 			char* temp_ip = new char[con_ip.length() + 1];
 			strcpy(temp_ip, con_ip.c_str());
-			no->removeNode(temp_ip);
+			node->removeNode(temp_ip);
+			cout<<"Peer leaving: "<<temp_ip<<endl;
 
 		}
 
@@ -142,31 +69,26 @@ void Peer::findOtherPeers()
 //tell broadcast you are in the netowrk
 void Peer::tellOtherPeers()
 {
-	
 	while (tellNetwork_Boolean)
 	{
 		if (sendto(socketUdp, msgBroadcast, strlen(msgBroadcast) + 1, 0, (sockaddr *)&Sender_addr, sizeof(Sender_addr)) < 0)
 		{
-			
-			cout << "Erro 3" << endl;
-			closesocket(socketUdp);
-			
+			error("Error sending info to other peers");
 		}
-		
-		Sleep(5000);
+		cout<<"Mensagem enviada";
+		sleep(5);
 	}
-
 }
 
 //leave the network
 void Peer::leave() {
 	string mensagemSaindo = "Leaving";
 	strcpy(msgBroadcast, mensagemSaindo.c_str());
-	Sleep(1500);
+	sleep(2);
 }
 
 //get video
-void Peer::getVideo() {
+void *Peer::getVideo() {
 	
 	sockaddr_in Video_addr;
 	
@@ -220,12 +142,6 @@ void Peer::getVideo() {
 	
 }
 
-//wrapper to start a thread with a class method
-void __cdecl Peer::temp(void * params) {
-
-		static_cast<Peer*>(params)->getVideo();
-}
-
 //connect to peer and send video daata
 void Peer::connectPeer(char* ip, int port) {
 	
@@ -234,8 +150,6 @@ void Peer::connectPeer(char* ip, int port) {
 	
 	ip_destino = ip;
 	porta_destino = port;
-	
-	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	
 	socketVideo = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -249,10 +163,9 @@ void Peer::connectPeer(char* ip, int port) {
 	Send_addr_video.sin_addr.s_addr = inet_addr(ip);
 
 	//start thread to get the video from other peer
-	_beginthread(&Peer::temp, 0, static_cast<void*>(this));
+	pthread_create( &thread[0], NULL, &Peer::getVideoWrapper, static_cast<void*>(this));
 
 	vector < uchar > encoded;
-	
 	VideoCapture cap(0);
 	while(!cap.isOpened()) cout << "Falha ao exibir a web cam";
 	
@@ -261,7 +174,7 @@ void Peer::connectPeer(char* ip, int port) {
 		Mat frame, send;
 		
 		cap >> frame;
-		
+
 		if (frame.empty()) continue;
 		
 		string servAddress = ip;
