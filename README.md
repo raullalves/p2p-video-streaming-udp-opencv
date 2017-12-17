@@ -9,7 +9,9 @@ When both hosts want to comunicate with each other, the stream begins.
 
 # Build
     * Install OpenCV (used for decoding and showing... TODO: Replace OpenCV by FFMpeg and SDL)
-    * ```make```
+    *   ```
+        make
+        ```
 
 # Run
     ./p2pstreaming
